@@ -1,0 +1,702 @@
+diff -bur linux-5.3.5/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi linux-5.3.5-mods/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi	2019-11-01 23:04:43.003395914 +0800
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi	2019-11-01 22:44:02.980321629 +0800
+@@ -36,6 +36,10 @@
+ 			device_type = "cpu";
+ 			reg = <0>;
+ 			enable-method = "psci";
++			clocks = <&ccu CLK_CPUX>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++			operating-points-v2 = <&cpu_opp_table>;
++			#cooling-cells = <2>;
+ 		};
+ 
+ 		cpu1: cpu@1 {
+@@ -43,6 +47,10 @@
+ 			device_type = "cpu";
+ 			reg = <1>;
+ 			enable-method = "psci";
++			clocks = <&ccu CLK_CPUX>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++			operating-points-v2 = <&cpu_opp_table>;
++			#cooling-cells = <2>;
+ 		};
+ 
+ 		cpu2: cpu@2 {
+@@ -50,6 +58,10 @@
+ 			device_type = "cpu";
+ 			reg = <2>;
+ 			enable-method = "psci";
++			clocks = <&ccu CLK_CPUX>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++			operating-points-v2 = <&cpu_opp_table>;
++			#cooling-cells = <2>;
+ 		};
+ 
+ 		cpu3: cpu@3 {
+@@ -57,6 +69,69 @@
+ 			device_type = "cpu";
+ 			reg = <3>;
+ 			enable-method = "psci";
++			clocks = <&ccu CLK_CPUX>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++			operating-points-v2 = <&cpu_opp_table>;
++			#cooling-cells = <2>;
++		};
++	};
++
++	cpu_opp_table: opp_table {
++		compatible = "operating-points-v2";
++		opp-shared;
++
++		opp@480000000 {
++			opp-hz = /bits/ 64 <480000000>;
++			opp-microvolt = <800000 800000 880000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@720000000 {
++			opp-hz = /bits/ 64 <720000000>;
++			opp-microvolt = <800000 800000 880000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@816000000 {
++			opp-hz = /bits/ 64 <816000000>;
++			opp-microvolt = <800000 800000 880000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@888000000 {
++			opp-hz = /bits/ 64 <888000000>;
++			opp-microvolt = <800000 800000 900000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@1080000000 {
++			opp-hz = /bits/ 64 <1080000000>;
++			opp-microvolt = <840000 840000 900000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@1320000000 {
++			opp-hz = /bits/ 64 <1320000000>;
++			opp-microvolt = <880000 880000 900000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@1488000000 {
++			opp-hz = /bits/ 64 <1488000000>;
++			opp-microvolt = <900000 900000 910000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++                opp@1640000000 {
++                        opp-hz = /bits/ 64 <1640000000>;
++                        opp-microvolt = <905000 900000 920000>;
++                        clock-latency-ns = <244144>; /* 8 32k periods */
++                };
++
++		opp@1800000000 {
++			opp-hz = /bits/ 64 <1800000000>;
++			opp-microvolt = <925000 920000 940000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
+ 		};
+ 	};
+ 
+@@ -361,6 +502,26 @@
+ 				pins = "PG8", "PG9";
+ 				function = "uart1";
+ 			};
++
++			uart2_pins: uart2-pins {
++				pins = "PD19", "PD20";
++				function = "uart2";
++			};
++
++			uart2_rts_cts_pins: uart2-rts-cts-pins {
++				pins = "PD21", "PD22";
++				function = "uart2";
++			};
++
++			uart3_pins: uart3-pins {
++				pins = "PD23", "PD24";
++				function = "uart3";
++			};
++
++			uart3_rts_cts_pins: uart3-rts-cts-pins {
++				pins = "PD25", "PD26";
++				function = "uart3";
++			};
+ 		};
+ 
+ 		gic: interrupt-controller@3021000 {
+@@ -836,6 +1055,11 @@
+ 				pins = "PL9";
+ 				function = "s_cir_rx";
+ 			};
++
++			r_uart_pins: r-uart {
++				pins = "PL2", "PL3";
++				function = "s_uart";
++			};
+ 		};
+ 
+ 		r_ir: ir@7040000 {
+diff -bur linux-5.3.5/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi.orig linux-5.3.5-mods/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi.orig
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi.orig	2019-11-01 23:04:42.996729266 +0800
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi.orig	2019-11-01 22:33:23.918518420 +0800
+@@ -36,6 +36,10 @@
+ 			device_type = "cpu";
+ 			reg = <0>;
+ 			enable-method = "psci";
++			clocks = <&ccu CLK_CPUX>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++			operating-points-v2 = <&cpu_opp_table>;
++			#cooling-cells = <2>;
+ 		};
+ 
+ 		cpu1: cpu@1 {
+@@ -43,6 +47,10 @@
+ 			device_type = "cpu";
+ 			reg = <1>;
+ 			enable-method = "psci";
++			clocks = <&ccu CLK_CPUX>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++			operating-points-v2 = <&cpu_opp_table>;
++			#cooling-cells = <2>;
+ 		};
+ 
+ 		cpu2: cpu@2 {
+@@ -50,6 +58,10 @@
+ 			device_type = "cpu";
+ 			reg = <2>;
+ 			enable-method = "psci";
++			clocks = <&ccu CLK_CPUX>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++			operating-points-v2 = <&cpu_opp_table>;
++			#cooling-cells = <2>;
+ 		};
+ 
+ 		cpu3: cpu@3 {
+@@ -57,6 +69,63 @@
+ 			device_type = "cpu";
+ 			reg = <3>;
+ 			enable-method = "psci";
++			clocks = <&ccu CLK_CPUX>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++			operating-points-v2 = <&cpu_opp_table>;
++			#cooling-cells = <2>;
++		};
++	};
++
++	cpu_opp_table: opp_table {
++		compatible = "operating-points-v2";
++		opp-shared;
++
++		opp@480000000 {
++			opp-hz = /bits/ 64 <480000000>;
++			opp-microvolt = <880000 880000 880000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@720000000 {
++			opp-hz = /bits/ 64 <720000000>;
++			opp-microvolt = <880000 880000 880000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@816000000 {
++			opp-hz = /bits/ 64 <816000000>;
++			opp-microvolt = <880000 880000 880000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@888000000 {
++			opp-hz = /bits/ 64 <888000000>;
++			opp-microvolt = <880000 880000 880000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@1080000000 {
++			opp-hz = /bits/ 64 <1080000000>;
++			opp-microvolt = <940000 940000 940000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@1320000000 {
++			opp-hz = /bits/ 64 <1320000000>;
++			opp-microvolt = <1000000 1000000 1000000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@1488000000 {
++			opp-hz = /bits/ 64 <1488000000>;
++			opp-microvolt = <1060000 1060000 1060000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
++		};
++
++		opp@1800000000 {
++			opp-hz = /bits/ 64 <1800000000>;
++			opp-microvolt = <1160000 1160000 1160000>;
++			clock-latency-ns = <244144>; /* 8 32k periods */
+ 		};
+ 	};
+ 
+@@ -176,6 +245,71 @@
+ 			allwinner,sram = <&ve_sram 1>;
+ 		};
+ 
++		gpu_opp_table: opp-table2 {
++			compatible = "operating-points-v2";
++
++			opp00 {
++				opp-hz = /bits/ 64 <756000000>;
++				opp-microvolt = <1040000>;
++			};
++			opp01 {
++				opp-hz = /bits/ 64 <624000000>;
++				opp-microvolt = <950000>;
++			};
++			opp02 {
++				opp-hz = /bits/ 64 <576000000>;
++				opp-microvolt = <930000>;
++			};
++			opp03 {
++				opp-hz = /bits/ 64 <540000000>;
++				opp-microvolt = <910000>;
++			};
++			opp04 {
++				opp-hz = /bits/ 64 <504000000>;
++				opp-microvolt = <890000>;
++			};
++			opp05 {
++				opp-hz = /bits/ 64 <456000000>;
++				opp-microvolt = <870000>;
++			};
++			opp06 {
++				opp-hz = /bits/ 64 <432000000>;
++				opp-microvolt = <860000>;
++			};
++			opp07 {
++				opp-hz = /bits/ 64 <420000000>;
++				opp-microvolt = <850000>;
++			};
++			opp08 {
++				opp-hz = /bits/ 64 <408000000>;
++				opp-microvolt = <840000>;
++			};
++			opp09 {
++				opp-hz = /bits/ 64 <384000000>;
++				opp-microvolt = <830000>;
++			};
++			opp10 {
++				opp-hz = /bits/ 64 <360000000>;
++				opp-microvolt = <820000>;
++			};
++			opp11 {
++				opp-hz = /bits/ 64 <336000000>;
++				opp-microvolt = <810000>;
++			};
++			opp12 {
++				opp-hz = /bits/ 64 <312000000>;
++				opp-microvolt = <810000>;
++			};
++			opp13 {
++				opp-hz = /bits/ 64 <264000000>;
++				opp-microvolt = <810000>;
++			};
++			opp14 {
++				opp-hz = /bits/ 64 <216000000>;
++				opp-microvolt = <810000>;
++			};
++		};
++
+ 		gpu: gpu@1800000 {
+ 			compatible = "arm,mali-t720", "arm,mali-midgard";
+ 			reg = <0x01800000 0x4000>;
+@@ -304,6 +439,13 @@
+ 				function = "i2c3";
+ 			};
+ 
++			ext_rmii_pins: rmii_pins {
++				pins = "PA0", "PA1", "PA2", "PA3", "PA4",
++				       "PA5", "PA6", "PA7", "PA8", "PA9";
++				function = "emac";
++				drive-strength = <40>;
++			};
++
+ 			hdmi_pins: hdmi-pins {
+ 				pins = "PH8", "PH9", "PH10";
+ 				function = "hdmi";
+diff -bur linux-5.3.5/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi.dtsi linux-5.3.5-mods/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi.dtsi
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi.dtsi	2019-11-01 23:04:42.750063276 +0800
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi.dtsi	2019-11-01 22:27:49.373046344 +0800
+@@ -55,6 +55,11 @@
+ 	status = "okay";
+ };
+ 
++&gpu {
++	mali-supply = <&reg_dcdcc>;
++	status = "okay";
++};
++
+ &mmc0 {
+ 	vmmc-supply = <&reg_cldo1>;
+ 	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>;
+@@ -163,6 +168,7 @@
+ 			};
+ 
+ 			reg_dcdcc: dcdcc {
++				regulator-enable-ramp-delay = <32000>;
+ 				regulator-min-microvolt = <810000>;
+ 				regulator-max-microvolt = <1080000>;
+ 				regulator-name = "vdd-gpu";
+diff -bur linux-5.3.5/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts linux-5.3.5-mods/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts	2019-10-08 01:01:58.000000000 +0800
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts	2019-11-01 22:49:16.406081772 +0800
+@@ -3,9 +3,343 @@
+  * Copyright (C) 2018 Jagan Teki <jagan@openedev.com>
+  */
+ 
+-#include "sun50i-h6-orangepi.dtsi"
++/dts-v1/;
++
++#include "sun50i-h6.dtsi"
++
++#include <dt-bindings/gpio/gpio.h>
+ 
+ / {
+ 	model = "OrangePi Lite2";
+ 	compatible = "xunlong,orangepi-lite2", "allwinner,sun50i-h6";
++
++	aliases {
++		serial0 = &uart0; /* debug */
++		serial1 = &uart1; /* BT-UART */
++	};
++
++	chosen {
++		stdout-path = "serial0:115200n8";
++	};
++
++	connector {
++		compatible = "hdmi-connector";
++		type = "a";
++		ddc-en-gpios = <&pio 7 2 GPIO_ACTIVE_HIGH>; /* PH2 ddc-supply = <&reg_ddc>; */
++
++		port {
++			hdmi_con_in: endpoint {
++				remote-endpoint = <&hdmi_out_con>;
++			};
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		power {
++			label = "orangepi:red:power";
++			gpios = <&r_pio 0 4 GPIO_ACTIVE_HIGH>; /* PL4 */
++			default-state = "on";
++		};
++
++		status {
++			label = "orangepi:green:status";
++			gpios = <&r_pio 0 7 GPIO_ACTIVE_HIGH>; /* PL7 */
++		};
++	};
++
++	reg_ddc: ddc-io {
++		compatible = "regulator-fixed";
++		regulator-name = "ddc-io";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		enable-active-high;
++		gpio = <&pio 7 2 GPIO_ACTIVE_HIGH>; /* PH2 */
++	};
++
++	reg_vcc5v: vcc5v {
++		/* board wide 5V supply directly from the DC jack */
++		compatible = "regulator-fixed";
++		regulator-name = "vcc-5v";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		regulator-always-on;
++	};
++
++	reg_usb_vbus: vbus {
++		compatible = "regulator-fixed";
++		regulator-name = "usb-vbus";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		startup-delay-us = <100000>;
++		gpio = <&r_pio 0 5 GPIO_ACTIVE_HIGH>; /* PL5 USB0-DRVVBUS */
++		enable-active-high;
++	};
++
++	wifi_pwrseq: wifi_pwrseq {
++		compatible = "mmc-pwrseq-simple";
++		clocks = <&rtc 1>;
++		clock-names = "ext_clock";
++		reset-gpios = <&r_pio 1 3 GPIO_ACTIVE_LOW>; /* PM3 */
++		post-power-on-delay-ms = <200>;
++	};
++};
++
++&cpu0 {
++	cpu-supply = <&reg_dcdca>;
++};
++
++&de {
++	status = "okay";
++};
++
++&hdmi {
++	status = "okay";
++};
++
++&hdmi_out {
++	hdmi_out_con: endpoint {
++		remote-endpoint = <&hdmi_con_in>;
++	};
++};
++
++&gpu {
++	mali-supply = <&reg_dcdcc>;
++	status = "okay";
++};
++
++&mmc0 {
++	vmmc-supply = <&reg_cldo1>;
++	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>; /* PF6 */
++	bus-width = <4>;
++	status = "okay";
++};
++
++&mmc1 {
++	vmmc-supply = <&reg_cldo2>;
++	vqmmc-supply = <&reg_bldo3>;
++	mmc-pwrseq = <&wifi_pwrseq>;
++	bus-width = <4>;
++	non-removable;
++	status = "okay";
++
++	brcm: sdio-wifi@1 {
++		reg = <1>;
++		compatible = "brcm,bcm4329-fmac";
++		interrupt-parent = <&r_pio>;
++		interrupts = <1 0 IRQ_TYPE_LEVEL_LOW>;	/* PM0 */
++		interrupt-names = "host-wake";
++	};
++};
++
++&pio {
++	vcc-pc-supply = <&reg_bldo2>;
++	vcc-pd-supply = <&reg_cldo1>;
++	vcc-pg-supply = <&reg_bldo3>;
++};
++
++&r_i2c {
++	status = "okay";
++
++	axp805: pmic@36 {
++		compatible = "x-powers,axp805", "x-powers,axp806";
++		reg = <0x36>;
++		interrupt-parent = <&r_intc>;
++		interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
++		interrupt-controller;
++		#interrupt-cells = <1>;
++		x-powers,self-working-mode;
++		vina-supply = <&reg_vcc5v>;
++		vinb-supply = <&reg_vcc5v>;
++		vinc-supply = <&reg_vcc5v>;
++		vind-supply = <&reg_vcc5v>;
++		vine-supply = <&reg_vcc5v>;
++		aldoin-supply = <&reg_vcc5v>;
++		bldoin-supply = <&reg_vcc5v>;
++		cldoin-supply = <&reg_vcc5v>;
++
++		regulators {
++			reg_aldo1: aldo1 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "vcc-pl-led-ir";
++			};
++
++			reg_aldo2: aldo2 {
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "vcc33-audio-tv-ephy-mac";
++			};
++
++			/* ALDO3 is shorted to CLDO1 */
++			reg_aldo3: aldo3 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "vcc33-io-pd-emmc-sd-usb-uart-1";
++			};
++
++			reg_bldo1: bldo1 {
++				regulator-always-on;
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-name = "vcc18-dram-bias-pll";
++			};
++
++			reg_bldo2: bldo2 {
++				regulator-always-on;
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-name = "vcc-efuse-pcie-hdmi-pc";
++			};
++
++			reg_bldo3: bldo3 {
++				regulator-always-on;
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-name = "vcc-dcxoio";
++			};
++
++			bldo4 {
++				/* unused */
++			};
++
++			reg_cldo1: cldo1 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "vcc33-io-pd-emmc-sd-usb-uart-2";
++			};
++
++			reg_cldo2: cldo2 {
++				/*
++				 * This regulator is connected with CLDO3.
++				 * Before the kernel can support synchronized
++				 * enable of coupled regulators, keep them
++				 * both always on as a ugly hack.
++				 */
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "vcc-wifi-1";
++			};
++
++			reg_cldo3: cldo3 {
++				/*
++				 * This regulator is connected with CLDO2.
++				 * See the comments for CLDO2.
++				 */
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "vcc-wifi-2";
++			};
++
++			reg_dcdca: dcdca {
++				regulator-always-on;
++				regulator-min-microvolt = <800000>;
++				regulator-max-microvolt = <1160000>;
++				regulator-name = "vdd-cpu";
++			};
++
++			reg_dcdcc: dcdcc {
++				regulator-min-microvolt = <810000>;
++				regulator-max-microvolt = <1080000>;
++				regulator-name = "vdd-gpu";
++			};
++
++			reg_dcdcd: dcdcd {
++				regulator-always-on;
++				regulator-min-microvolt = <960000>;
++				regulator-max-microvolt = <960000>;
++				regulator-name = "vdd-sys";
++			};
++
++			reg_dcdce: dcdce {
++				regulator-always-on;
++				regulator-min-microvolt = <1200000>;
++				regulator-max-microvolt = <1200000>;
++				regulator-name = "vcc-dram";
++			};
++
++			sw {
++				/* unused */
++			};
++		};
++	};
++};
++
++&uart0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart0_ph_pins>;
++	status = "okay";
++};
++
++/* There's the BT part of the AP6255 connected to that UART */
++&uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
++	uart-has-rtscts;
++	status = "okay";
++
++	bluetooth {
++		compatible = "brcm,bcm4345c5";
++		clocks = <&rtc 1>;
++		clock-names = "lpo";
++		device-wakeup-gpios = <&r_pio 1 2 GPIO_ACTIVE_HIGH>; /* PM2 */
++		host-wakeup-gpios = <&r_pio 1 1 GPIO_ACTIVE_HIGH>; /* PM1 */
++		shutdown-gpios = <&r_pio 1 4 GPIO_ACTIVE_HIGH>; /* PM4 */
++		max-speed = <1500000>;
++	};
++};
++
++&uart3 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart3_pins>, <&uart3_rts_cts_pins>;
++	uart-has-rtscts;
++	status = "disabled";
++};
++
++&usb2otg {
++	/*
++	 * This board doesn't have a controllable VBUS even though it
++	 * does have an ID pin. Using it as anything but a USB host is
++	 * unsafe.
++	 */
++	dr_mode = "host";
++	status = "okay";
++};
++
++&usb2phy {
++	usb0_id_det-gpios = <&pio 2 6 GPIO_ACTIVE_HIGH>; /* PC6 */
++	usb0_vbus-supply = <&reg_vcc5v>;
++	usb3_vbus-supply = <&reg_vcc5v>;
++	status = "okay";
++};
++
++&ehci0 {
++	status = "okay";
++};
++
++&ohci0 {
++	status = "okay";
++};
++
++&ehci3 {
++	status = "okay";
++};
++
++&ohci3 {
++	status = "okay";
++};
++
++&usb3phy {
++	phy-supply = <&reg_usb_vbus>;
++	status = "okay";
++};
++
++&dwc3 {
++	status = "okay";
+ };
