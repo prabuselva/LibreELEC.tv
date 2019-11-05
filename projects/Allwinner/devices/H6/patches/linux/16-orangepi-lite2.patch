@@ -1,0 +1,172 @@
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts	2019-10-08 01:01:58.000000000 +0800
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts	2019-11-05 21:30:28.571120684 +0800
+@@ -3,9 +3,169 @@
+  * Copyright (C) 2018 Jagan Teki <jagan@openedev.com>
+  */
+ 
++/dts-v1/;
++
+ #include "sun50i-h6-orangepi.dtsi"
+ 
+ / {
+ 	model = "OrangePi Lite2";
+ 	compatible = "xunlong,orangepi-lite2", "allwinner,sun50i-h6";
++
++	aliases {
++		serial1 = &uart1; /* BT-UART */
++	};
++
++
++	connector {
++		compatible = "hdmi-connector";
++		type = "a";
++		ddc-en-gpios = <&pio 7 2 GPIO_ACTIVE_HIGH>; /* PH2 ddc-supply = <&reg_ddc>; */
++
++		port {
++			hdmi_con_in: endpoint {
++				remote-endpoint = <&hdmi_out_con>;
++			};
++		};
++	};
++
++	reg_ddc: ddc-io {
++		compatible = "regulator-fixed";
++		regulator-name = "ddc-io";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		enable-active-high;
++		gpio = <&pio 7 2 GPIO_ACTIVE_HIGH>; /* PH2 */
++	};
++
++	reg_usb_vbus: vbus {
++		compatible = "regulator-fixed";
++		regulator-name = "usb-vbus";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		startup-delay-us = <100000>;
++		gpio = <&r_pio 0 5 GPIO_ACTIVE_HIGH>; /* PL5 USB0-DRVVBUS */
++		enable-active-high;
++	};
++
++	wifi_pwrseq: wifi_pwrseq {
++		compatible = "mmc-pwrseq-simple";
++		clocks = <&rtc 1>;
++		clock-names = "ext_clock";
++		reset-gpios = <&r_pio 1 3 GPIO_ACTIVE_LOW>; /* PM3 */
++		post-power-on-delay-ms = <200>;
++	};
++};
++
++&cpu0 {
++	cpu-supply = <&reg_dcdca>;
++};
++
++&gpu {
++	mali-supply = <&reg_dcdcc>;
++	status = "okay";
++};
++
++&de {
++	status = "okay";
++};
++
++&hdmi {
++	status = "okay";
++};
++
++&hdmi_out {
++	hdmi_out_con: endpoint {
++		remote-endpoint = <&hdmi_con_in>;
++	};
++};
++
++&mmc1 {
++	vmmc-supply = <&reg_cldo2>;
++	vqmmc-supply = <&reg_bldo3>;
++	mmc-pwrseq = <&wifi_pwrseq>;
++	bus-width = <4>;
++	non-removable;
++	status = "okay";
++
++	brcm: sdio-wifi@1 {
++		reg = <1>;
++		compatible = "brcm,bcm4329-fmac";
++		interrupt-parent = <&r_pio>;
++		interrupts = <1 0 IRQ_TYPE_LEVEL_LOW>;	/* PM0 */
++		interrupt-names = "host-wake";
++	};
++};
++
++&pio {
++	vcc-pc-supply = <&reg_bldo2>;
++	vcc-pd-supply = <&reg_cldo1>;
++	vcc-pg-supply = <&reg_bldo3>;
++};
++
++&r_i2c {
++	status = "okay";
++
++	axp805: pmic@36 {
++		regulators {
++			reg_cldo2: cldo2 {
++				/*
++				 * This regulator is connected with CLDO3.
++				 * Before the kernel can support synchronized
++				 * enable of coupled regulators, keep them
++				 * both always on as a ugly hack.
++				 */
++				regulator-always-on;
++			};
++
++			reg_cldo3: cldo3 {
++				/*
++				 * This regulator is connected with CLDO2.
++				 * See the comments for CLDO2.
++				 */
++				regulator-always-on;
++			};
++
++			reg_dcdca: dcdca {
++				regulator-min-microvolt = <800000>;
++				regulator-max-microvolt = <1160000>;
++			};
++		};
++	};
++};
++
++/* There's the BT part of the AP6255 connected to that UART */
++&uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
++	uart-has-rtscts;
++	status = "okay";
++
++	bluetooth {
++		compatible = "brcm,bcm4345c5";
++		clocks = <&rtc 1>;
++		clock-names = "lpo";
++		device-wakeup-gpios = <&r_pio 1 2 GPIO_ACTIVE_HIGH>; /* PM2 */
++		host-wakeup-gpios = <&r_pio 1 1 GPIO_ACTIVE_HIGH>; /* PM1 */
++		shutdown-gpios = <&r_pio 1 4 GPIO_ACTIVE_HIGH>; /* PM4 */
++		max-speed = <1500000>;
++	};
++};
++
++&usb2otg {
++	/*
++	 * This board doesn't have a controllable VBUS even though it
++	 * does have an ID pin. Using it as anything but a USB host is
++	 * unsafe.
++	 */
++	dr_mode = "host";
++	status = "okay";
++};
++
++&usb3phy {
++	phy-supply = <&reg_usb_vbus>;
++	status = "okay";
++};
++
++&dwc3 {
++	status = "okay";
+ };
