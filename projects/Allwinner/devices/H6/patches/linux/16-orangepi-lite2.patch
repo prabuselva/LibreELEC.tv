@@ -1,6 +1,20 @@
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi.dtsi	2019-11-06 20:18:47.685583549 +0800
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi.dtsi	2019-11-06 20:21:30.151635477 +0800
+@@ -55,6 +55,11 @@
+ 	status = "okay";
+ };
+ 
++&gpu {
++	mali-supply = <&reg_dcdcc>;
++	status = "okay";
++};
++
+ &mmc0 {
+ 	vmmc-supply = <&reg_cldo1>;
+ 	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>;
 --- a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts	2019-10-08 01:01:58.000000000 +0800
-+++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts	2019-11-05 21:30:28.571120684 +0800
-@@ -3,9 +3,169 @@
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts	2019-11-06 20:23:18.611227802 +0800
+@@ -3,9 +3,155 @@
   * Copyright (C) 2018 Jagan Teki <jagan@openedev.com>
   */
  
@@ -20,22 +34,13 @@
 +	connector {
 +		compatible = "hdmi-connector";
 +		type = "a";
-+		ddc-en-gpios = <&pio 7 2 GPIO_ACTIVE_HIGH>; /* PH2 ddc-supply = <&reg_ddc>; */
++		ddc-en-gpios = <&pio 7 2 GPIO_ACTIVE_HIGH>; /* PH2 */
 +
 +		port {
 +			hdmi_con_in: endpoint {
 +				remote-endpoint = <&hdmi_out_con>;
 +			};
 +		};
-+	};
-+
-+	reg_ddc: ddc-io {
-+		compatible = "regulator-fixed";
-+		regulator-name = "ddc-io";
-+		regulator-min-microvolt = <5000000>;
-+		regulator-max-microvolt = <5000000>;
-+		enable-active-high;
-+		gpio = <&pio 7 2 GPIO_ACTIVE_HIGH>; /* PH2 */
 +	};
 +
 +	reg_usb_vbus: vbus {
@@ -61,12 +66,11 @@
 +	cpu-supply = <&reg_dcdca>;
 +};
 +
-+&gpu {
-+	mali-supply = <&reg_dcdcc>;
++&de {
 +	status = "okay";
 +};
 +
-+&de {
++&dwc3 {
 +	status = "okay";
 +};
 +
@@ -164,9 +168,5 @@
 +
 +&usb3phy {
 +	phy-supply = <&reg_usb_vbus>;
-+	status = "okay";
-+};
-+
-+&dwc3 {
 +	status = "okay";
  };
