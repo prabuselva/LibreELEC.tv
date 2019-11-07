@@ -1,11 +1,10 @@
---- a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi.dtsi	2019-11-06 20:18:47.685583549 +0800
-+++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi.dtsi	2019-11-06 20:21:30.151635477 +0800
-@@ -55,6 +55,11 @@
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi.dtsi	2019-11-07 23:48:40.142806766 +0800
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi.dtsi	2019-11-07 23:49:31.019376538 +0800
+@@ -55,6 +55,10 @@
  	status = "okay";
  };
  
 +&gpu {
-+	mali-supply = <&reg_dcdcc>;
 +	status = "okay";
 +};
 +
@@ -13,8 +12,8 @@
  	vmmc-supply = <&reg_cldo1>;
  	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>;
 --- a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts	2019-10-08 01:01:58.000000000 +0800
-+++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts	2019-11-06 20:23:18.611227802 +0800
-@@ -3,9 +3,155 @@
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dts	2019-11-07 23:49:22.166060055 +0800
+@@ -3,9 +3,159 @@
   * Copyright (C) 2018 Jagan Teki <jagan@openedev.com>
   */
  
@@ -72,6 +71,10 @@
 +
 +&dwc3 {
 +	status = "okay";
++};
++
++&gpu {
++	mali-supply = <&reg_dcdcc>;
 +};
 +
 +&hdmi {
